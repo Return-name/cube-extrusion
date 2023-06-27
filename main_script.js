@@ -114,19 +114,18 @@ function extrudeMeshFacetAndAdjacentFacet(mesh, facet, move) {
     facetVerticesIndices.push(...meshIndices.slice(adjacentFacet * 3, adjacentFacet * 3 + 3));
     facetVerticesIndices = new Array(... new Set(facetVerticesIndices));
 
-    const positionFunction = function (positions) {
+    const positions = mesh.getVerticesData(BABYLON.VertexBuffer.PositionKind);
     facetVerticesIndices.map((idx) => {
         const p = idx * 3;
 
         // Math.sign is used to correctly handle the direction of extrusion according to mouse movements
         positions[p] += Math.sign(facetNormal.x) * facetNormal.x * move._x / 500;
-        positions[p + 1] += facetNormal.y * move._y / 500;
+        positions[p + 1] += Math.sign(facetNormal.y) * facetNormal.y * move._y / 500;
         positions[p + 2] += Math.sign(facetNormal.z) * facetNormal.z * move._z / 500;
 
     })
-    };
-    mesh.updateMeshPositions(positionFunction, true);
-    mesh.updateIndices(meshIndices);
+
+    mesh.setVerticesData(BABYLON.VertexBuffer.PositionKind, positions);
 }
 
 var getMousePositionInWorld = function (scene) {
